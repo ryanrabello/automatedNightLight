@@ -1,15 +1,15 @@
-//change these values to your liking. 
+//change these values to your liking.
 int LEDpin[3] = {3,5,6};
 int photocellPin = 0;
 int timeDim = 300;
 int timeOn = 1800;
 int ledMaxBright = 255;
+int ledDim = 150;     //led brightness after timeDim seconds.
 //photo sensor reading for toggling the led on/off state
 int ledSwitch = 5;
 //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
 int ledBuffer = 7;
-//led brightness after 5 minutes
-int ledDim = 150;
+
 
 //variables you should not mess with.(they change as the program runs)
 int currentLedSwitch = ledSwitch;
@@ -108,7 +108,7 @@ void LEDstate(int  s) {
     }
     if( time ==0)
       time = 1;
-  } 
+  }
   else {
     //FADE OFF LED
     currentLedSwitch = ledSwitch;
