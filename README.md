@@ -3,12 +3,12 @@ An arduino project for an elegant simple night light.I thought that this would h
 ##What it's supposed to do. 
 The amazing automated night light is supposed to be a night light that doesn't get noticed. Once you flip off the lights the inteligent night light will fade on to full brightness. This gives you the required lumens to find your bed without loosing any important organs, limbs, or self esteem. Once your in bed you'll probably need to plug in your phone, check the time and ponder the pros and cons of getting up and using the restroom. After a while (about 5 minutes by default) the night light will dim to about 60% brighness and will go off by default after a total of 30 minutes at which point any thought of going to the restroom should be replaced with the knowlege of how exposed your toes (and corners) are. 
 ##Setup
-- **1.**click on the .ino file
-- **2.**Click raw and then file->save to get the file.
-- **3.**Open the downloaded file with the Arduino IDE
-- **4.**The IDE will ask if you want to make a folder around the file click 'yes'.
-- **5.**Change the led pins or any other configuration to your liking.
-- **6.**Upload to your arduino.
+1. click on the .ino file
+2. Click raw and then file->save to get the file.
+3. Open the downloaded file with the Arduino IDE
+4. The IDE will ask if you want to make a folder around the file click 'yes'.
+5. Change the `LedPins[]` array or any other configuration to your liking.
+6. Upload to your arduino.
 
 ##Configuration
 - `LedPins[3]`  is an array of the pins used for lighting up leds. (currenlty only supports up to three #needAForLoop).
