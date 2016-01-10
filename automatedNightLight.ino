@@ -29,7 +29,6 @@ void setup() {
   }
   //Get random brightness and use it as the seed.
   randomSeed(analogRead(0));
-  Serial.begin(9600);
 }
 
 //set all the led's to the inputed value
