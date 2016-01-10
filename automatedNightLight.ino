@@ -1,10 +1,9 @@
 //Initialize led pins
-int led[] = {
-  9,5,6};  //For 
+int led[] = {9,5,6};
 
 //Other config options see https://github.com/asteroidice/automatedNightLight/ for detailed info on what they do.
 const int photocellPin = 0;
-const int timeDim = 60;
+const int timeDim = 120;
 const int timeOn = 1800;    
 const int ledMaxBright = 255;
 const int ledDim = 150;     //led brightness after timeDim seconds.
@@ -18,10 +17,9 @@ int ledStates[] = {
   255,255,255};
 //More global variables
 int currentLedSwitch = ledSwitch;
-int photocellBrightness;
 int time = 0;
 int mainDelay = 1000;
-float pulseX = 0;
+char mode = 'a';
 
 void setup() {
   //Initialize those output ports.
@@ -29,8 +27,9 @@ void setup() {
     pinMode(led[i],OUTPUT);
     analogWrite(led[i],255);//Turn off all RGB led pins
   }
-  //Get random brightness
+  //Get random brightness and use it as the seed.
   randomSeed(analogRead(0));
+  Serial.begin(9600);
 }
 
 //set all the led's to the inputed value
@@ -82,64 +81,78 @@ void sineFadeTo(int red, int green, int blue,int transitionTime) {
   ledStates[1] = green;
   ledStates[2] = blue;
 }
-
-void LEDstate(int  s) {
-  int rand = (int)(random(0,3) + .5);
-  if (s == 1) {
-    //FADE ON LED
-    currentLedSwitch = ledBuffer;
-    switch(rand) {
-    case 0:
-      fadeTo(150,255,255,1000);
-      break;
-    case 1:
-      fadeTo(255,255,150,1000);
-      break;
-    default:
-      fadeTo(255,150,255,1000);
-      break;
+void lightOn() {
+  //Turn light on for X minutes and then fade it to dark then turn off light and goto sleep mode (all the while checking if the lights came back on)
+  if(ledStates[0] != 255 || ledStates[1] != 255 || ledStates[2] != 255) { //if light is on
+    time++;
+    if(time >= timeDim){
+      mode = 'n';
+      fadeTo(220,240,255,3000);
     }
-    if( time ==0)
-      time = 1;
+    if(time % 10 == 0)
+      changeLed();
+  }else {
+    changeLed();
+    currentLedSwitch = ledBuffer;
   }
-  else {
-    //FADE OFF LED
-    currentLedSwitch = ledSwitch;
-    mainDelay = 1000;
-    fadeTo(255,255,255,1000);
-    time = 0;
+  
+}
+void changeLed() {
+  int ranLed[3];
+  if((int)(random(0,4) + .5) == 0){
+    //25% of time. 
+    for (int i = 0; i < 3; i ++){
+      ranLed[i] = (int)(random(150,255) + .5);
+    }
+  }else{
+    //75% of time. 
+    while(true){
+      for (int i = 0; i < 3; i ++){
+        ranLed[i] = 105*(int)(random(0,2)) + 150;
+      }
+      if(ranLed[0] != 255 || ranLed[1] != 255 || ranLed[2] != 255)
+        break;
+    }
+  }
+  fadeTo(ranLed[0],ranLed[1],ranLed[2],1000);
+}
+  
+void nap() {
+  time++;
+  if(time >= timeOn){
+    mode = 's';
+    fadeTo(255,255,255,3000);
+    mainDelay = 10000;
   }
 }
-
+void reset() {
+  fadeTo(255,255,255,1000);
+  mode = 'a';
+  mainDelay = 1000;
+  currentLedSwitch = ledSwitch;
+  time = 0;
+}
 void loop() {
-  if(time > 0)
-    time++;
-  if(time > timeOn){
-    //Put light into sleep mode
-    time = -1;
-    mainDelay = 10000;
-    fadeTo(255,255,255,10000);
-    ;//Slow off LED
+  if(currentLedSwitch < analogRead(photocellPin)){
+    reset();
   }
-  //grab info
-  photocellBrightness = analogRead(photocellPin);
-  //range for photo sensor.
-  if(time == timeDim){
-    fadeTo(220,240,255,3000);//LED dim
+  switch(mode) {
+    case 'a'://awake check if lights go off
+      if(currentLedSwitch >= analogRead(photocellPin)){
+        lightOn();
+      }
+      break;
+    case 'n':
+      nap();
+      break;
+    case 's':
+      //sleep mode
+      delay(10000);
+      break;
+    default:
+      mode = 'n';
+      break;
   }
-  if(time !=-1)
-  {
-    if (photocellBrightness <= currentLedSwitch)
-    {
-      if(!(time > 0))
-        LEDstate(1);
-    }
-    else
-      LEDstate(-1);
-  }
-  else
-    if(photocellBrightness > currentLedSwitch)
-      LEDstate(-1);
   delay(mainDelay);
 }
 
