@@ -7,18 +7,19 @@ The amazing automated night light is supposed to be a night light that doesn't g
 2. Click raw and then file->save to get the file.
 3. Open the downloaded file with the Arduino IDE
 4. The IDE will ask if you want to make a folder around the file click 'yes'.
-5. Change the `LedPins[]` array or any other configuration to your liking.
+5. Connect a RBG led to your arduino like [this](https://learn.adafruit.com/system/assets/assets/000/002/092/medium800/learn_arduino_fritzing.jpg?1396779188).
+5. Change the `LedPins[]` array to match your board/wiring specs and change any other configuration to your liking.
 6. Upload to your arduino.
 
 ##Configuration
-- `LedPins[3]`  is an array of the pins used for lighting up leds. (currenlty only supports up to three #needAForLoop).
+- `LedPins[3]`  is an array of the pins used for lighting up leds. (currenlty supports only RGB LED).
 - `photocellPin` is the pin number for the photocell. Wired like [this](https://learn.adafruit.com/system/assets/assets/000/000/459/medium800/light_cdspulldowndiag.gif?1396763222).
 - `timeDim` is the time (in seconds) it takes for the led to dim to desired dim brightness. 
-- `timeOn` the amount of time (overall) that the night light will remain on after darkness fell upon the land. 
-- `ledMaxBright` the `anologeWrite()` output for the LED (255 is full blast).
-- `ledDim` the `anologeWrite()` input for Dim stage (the stage after the light has been on for timeDim seconds).
+- `timeOn` the amount of time (overall) that the night light will remain on after darkness falls upon the surrounding area. 
+- `ledOn` the `anologeWrite()` input for when the LED is turned on .
+- `ledOff` the `anologeWrite()` input for when the LED is turned off.
 - `ledSwitch` the `anologeRead()` value that is used as the threshold between night and day.
-- `ledBuffer` is the amount of light required to turn the night light back off after it has been turned on. (this is used to fix an issue where the night light would switch on and off due to fluxuating light values at dusk). 
+- `ledBuffer` is the amount of light required to turn the night light back off after it has been turned on. (this is used to fix an issue where the night light would continuously switch on and off due to fluctuating light values at dusk). 
 
 ##What to do if this repo gives you the hebejebes.
 1. Let me know what it is you don't like, think could use improvement, or have a seriouse problem with.
