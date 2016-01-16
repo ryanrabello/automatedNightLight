@@ -87,6 +87,7 @@ void lightOn() {
     if(time >= timeDim){
       mode = 'n';
       fadeTo(220,240,255,3000);
+      break;
     }
     if(time % 10 == 0)
       changeLed();
