@@ -5,16 +5,16 @@ int led[] = {9,5,6};
 const int photocellPin = 0;
 const int timeDim = 120;
 const int timeOn = 1800;    
-const int ledMaxBright = 255;
-const int ledDim = 150;     //led brightness after timeDim seconds.
+const int ledOff = 255;
+const int ledOn = 0;     //led brightness after timeDim seconds.
 const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
 const int ledBuffer = 7;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
 
 //Don Touch it!!!
 //These values are global variables becuase they need to be referenced later.
-//they are set to 255 so RGB led's are off.
+//they are set to ledOff so RGB led's are off.
 int ledStates[] = {
-  255,255,255};
+  ledOff,ledOff,ledOff};
 //More global variables
 int currentLedSwitch = ledSwitch;
 int time = 0;
@@ -25,7 +25,7 @@ void setup() {
   //Initialize those output ports.
   for(int i = 0; i < (sizeof(led)/sizeof(int)); i++) {
     pinMode(led[i],OUTPUT);
-    analogWrite(led[i],255);//Turn off all RGB led pins
+    analogWrite(led[i],ledOff);//Turn off all RGB led pins
   }
   //Get random brightness and use it as the seed.
   randomSeed(analogRead(0));
@@ -82,12 +82,12 @@ void sineFadeTo(int red, int green, int blue,int transitionTime) {
 }
 void lightOn() {
   //Turn light on for X minutes and then fade it to dark then turn off light and goto sleep mode (all the while checking if the lights came back on)
-  if(ledStates[0] != 255 || ledStates[1] != 255 || ledStates[2] != 255) { //if light is on
+  if(ledStates[0] != ledOff || ledStates[1] != ledOff || ledStates[2] != ledOff) { //if light is on
     time++;
     if(time >= timeDim){
       mode = 'n';
       fadeTo(220,240,255,3000);
-      break;
+      return;
     }
     if(time % 10 == 0)
       changeLed();
@@ -97,36 +97,42 @@ void lightOn() {
   }
   
 }
-void changeLed() {
+void changeLed(){
+  changeLed(false);
+}
+void changeLed(boolean slow) {
   int ranLed[3];
   if((int)(random(0,4) + .5) == 0){
     //25% of time. 
     for (int i = 0; i < 3; i ++){
-      ranLed[i] = (int)(random(150,255) + .5);
+      ranLed[i] = (int)(random(ledOn,ledOff) + .5);
     }
   }else{
     //75% of time. 
     while(true){
       for (int i = 0; i < 3; i ++){
-        ranLed[i] = 105*(int)(random(0,2)) + 150;
+        ranLed[i] = (ledOff-ledOn)*(int)(random(0,2)) + ledOn;
       }
-      if(ranLed[0] != 255 || ranLed[1] != 255 || ranLed[2] != 255)
+      if(ranLed[0] != ledOff || ranLed[1] != ledOff || ranLed[2] != ledOff)
         break;
     }
   }
-  fadeTo(ranLed[0],ranLed[1],ranLed[2],1000);
+  if(slow)
+    fadeTo(ranLed[0],ranLed[1],ranLed[2],3000);
+  else
+    fadeTo(ranLed[0],ranLed[1],ranLed[2],1000);
 }
   
 void nap() {
   time++;
   if(time >= timeOn){
     mode = 's';
-    fadeTo(255,255,255,3000);
+    fadeTo(ledOff,ledOff,ledOff,3000);
     mainDelay = 10000;
   }
 }
 void reset() {
-  fadeTo(255,255,255,1000);
+  fadeTo(ledOff,ledOff,ledOff,1000);
   mode = 'a';
   mainDelay = 1000;
   currentLedSwitch = ledSwitch;
