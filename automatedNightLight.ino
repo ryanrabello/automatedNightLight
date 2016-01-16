@@ -5,8 +5,8 @@ int led[] = {9,5,6};
 const int photocellPin = 0;
 const int timeDim = 120;
 const int timeOn = 1800;    
-const int ledOff = 255;
-const int ledOn = 0;     //led brightness after timeDim seconds.
+const int ledOff = 255;     //Led full of pwm value.
+const int ledOn = 150;        //led full pwm brightness.
 const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
 const int ledBuffer = 7;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
 
@@ -20,6 +20,7 @@ int currentLedSwitch = ledSwitch;
 int time = 0;
 int mainDelay = 1000;
 char mode = 'a';
+int prevAnalogRead;
 
 void setup() {
   //Initialize those output ports.
@@ -90,7 +91,7 @@ void lightOn() {
       return;
     }
     if(time % 10 == 0)
-      changeLed();
+      changeLed(true);
   }else {
     changeLed();
     currentLedSwitch = ledBuffer;
@@ -131,6 +132,35 @@ void nap() {
     mainDelay = 10000;
   }
 }
+void randomPattern() {
+  int count = 10;
+  int ranLed[3];
+  int randFade = (int)(random(100,500)+.5);
+  int randWait = (int)(random(100,500)+.5);
+  while(count > 0) {
+    if((int)(random(0,4) + .5) == 0){
+      //25% of time.
+      for (int i = 0; i < 3; i ++){
+        ranLed[i] = (int)(random(ledOn,ledOff) + .5);
+      }
+    }else{
+      //75% of time. 
+      while(true){
+        for (int i = 0; i < 3; i ++){
+          ranLed[i] = (ledOff-ledOn)*(int)(random(0,2)) + ledOn;
+        }
+        if(ranLed[0] != ledOff || ranLed[1] != ledOff || ranLed[2] != ledOff)
+          break;
+      }
+    }
+    fadeTo(ranLed[0],ranLed[1],ranLed[2],randFade);
+    delay(randWait);
+    if(count < (int)(random(0,10)+.5))
+      break;
+    count--;
+  }
+  fadeTo(ledOff,ledOff,ledOff,1000);
+}
 void reset() {
   fadeTo(ledOff,ledOff,ledOff,1000);
   mode = 'a';
@@ -139,13 +169,19 @@ void reset() {
   time = 0;
 }
 void loop() {
-  if(currentLedSwitch < analogRead(photocellPin)){
+  int a = analogRead(photocellPin);
+  if(currentLedSwitch < a){
     reset();
   }
   switch(mode) {
     case 'a'://awake check if lights go off
-      if(currentLedSwitch >= analogRead(photocellPin)){
+      if(currentLedSwitch >= a){
         lightOn();
+      }else{
+        //add some fun on abiance changes
+        if(abs(a-prevAnalogRead) > 10)
+          randomPattern();
+        prevAnalogRead = a;
       }
       break;
     case 'n':
