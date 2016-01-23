@@ -9,6 +9,7 @@ const int ledOff = 255;     //Led full of pwm value.
 const int ledOn = 150;        //led full pwm brightness.
 const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
 const int ledBuffer = 7;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
+const int speackerPin = 3;
 
 //Don Touch it!!!
 //These values are global variables becuase they need to be referenced later.
@@ -21,6 +22,15 @@ int time = 0;
 int mainDelay = 1000;
 char mode = 'a';
 int prevAnalogRead;
+int notes[] = {
+NOTE_B2 ,NOTE_C3 ,NOTE_D3 ,NOTE_E3 ,NOTE_F3 ,NOTE_G3 ,NOTE_A3 ,NOTE_B3 ,NOTE_C4 ,NOTE_D4 ,NOTE_E4 ,NOTE_F4 ,NOTE_G4 ,NOTE_A4 ,NOTE_B4 ,NOTE_C5 ,NOTE_D5 ,NOTE_E5 ,NOTE_F5 ,NOTE_G5 ,NOTE_A5 ,NOTE_B5 ,NOTE_C6 ,NOTE_D6
+};
+const int noteSize = 23;
+// note durations: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations[] = {
+  2,3,4, 8, 16 , 32
+};
+const int durationSize = 4;
 
 void setup() {
   //Initialize those output ports.
@@ -132,11 +142,25 @@ void nap() {
     mainDelay = 10000;
   }
 }
+void randomTune() {
+  int count = 5;
+  while(count > 0) {
+    int nrandWait = 1000/noteDurations[(int)(random(0,durationSize)+.5)];
+    int randNote = (int)(random(0,noteSize) + .5);
+    tone(speackerPin, notes[randNote], nrandWait);
+    delay(randWait * 1.30);
+    if(count < (int)(random(0,10)+.5))
+      break;
+    count--;
+  }
+  noTone(speackerPin);
+}
 void randomPattern() {
-  int count = 10;
+  //randomTune();
+  int count = 5;
   int ranLed[3];
-  int randFade = (int)(random(100,500)+.5);
-  int randWait = (int)(random(100,500)+.5);
+  int randFade = (int)(random(20,500)+.5);
+  int randWait = (int)(random(20,500)+.5);
   while(count > 0) {
     if((int)(random(0,4) + .5) == 0){
       //25% of time.
@@ -159,7 +183,7 @@ void randomPattern() {
       break;
     count--;
   }
-  fadeTo(ledOff,ledOff,ledOff,1000);
+  fadeTo(ledOff,ledOff,ledOff,randWait);
 }
 void reset() {
   fadeTo(ledOff,ledOff,ledOff,1000);
@@ -179,7 +203,7 @@ void loop() {
         lightOn();
       }else{
         //add some fun on abiance changes
-        if(abs(a-prevAnalogRead) > 10)
+        if(abs(a-prevAnalogRead) > 5)
           randomPattern();
         prevAnalogRead = a;
       }
