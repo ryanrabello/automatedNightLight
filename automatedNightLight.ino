@@ -172,13 +172,13 @@ void randomPattern() {
           break;
       }
     }
-    //fadeTo(ranLed[0],ranLed[1],ranLed[2],randWait);
-    writeAll(ranLed[0],ranLed[1],ranLed[2]);
+    fadeTo(ranLed[0],ranLed[1],ranLed[2],75);
+    //writeAll(ranLed[0],ranLed[1],ranLed[2]);
     
-    delay(randWait*1.30);
+    delay(randWait*.75);
     noTone(speackerPin);
     //run atleast twice then there exists a probability of exiting. 
-    if(count < (int)(random(0,4)+.5))
+    if(count < (int)(random(0,5)+.5))
       break;
     count--;
   }
