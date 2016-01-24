@@ -1,3 +1,4 @@
+#include "pitches.h"
 //Initialize led pins
 int led[] = {9,5,6};
 
@@ -44,10 +45,15 @@ void setup() {
 
 //set all the led's to the inputed value
 void writeAll(int pwm){
-  for(int i = 0; i < (sizeof(led)/sizeof(int)); i++) {
-    analogWrite(led[i],pwm);
-    ledStates[i] = pwm;
-  }
+  writeAll(pwm,pwm,pwm);
+}
+void writeAll(int r, int g, int b) {
+  analogWrite(led[0],r);
+  ledStates[0] = r;
+  analogWrite(led[1],g);
+  ledStates[1] = g;
+  analogWrite(led[2],b);
+  ledStates[2] = b;
 }
 
 //Transistion from current to inputed values 
@@ -142,26 +148,15 @@ void nap() {
     mainDelay = 10000;
   }
 }
-void randomTune() {
-  int count = 5;
-  while(count > 0) {
-    int nrandWait = 1000/noteDurations[(int)(random(0,durationSize)+.5)];
-    int randNote = (int)(random(0,noteSize) + .5);
-    tone(speackerPin, notes[randNote], nrandWait);
-    delay(randWait * 1.30);
-    if(count < (int)(random(0,10)+.5))
-      break;
-    count--;
-  }
-  noTone(speackerPin);
-}
+
 void randomPattern() {
-  //randomTune();
   int count = 5;
   int ranLed[3];
-  int randFade = (int)(random(20,500)+.5);
-  int randWait = (int)(random(20,500)+.5);
   while(count > 0) {
+    int randWait = 1000/noteDurations[(int)(random(0,durationSize)+.5)];
+    int randNote = (int)(random(0,noteSize) + .5);
+    tone(speackerPin, notes[randNote]);
+    //Configure led array
     if((int)(random(0,4) + .5) == 0){
       //25% of time.
       for (int i = 0; i < 3; i ++){
@@ -177,13 +172,18 @@ void randomPattern() {
           break;
       }
     }
-    fadeTo(ranLed[0],ranLed[1],ranLed[2],randFade);
-    delay(randWait);
-    if(count < (int)(random(0,10)+.5))
+    //fadeTo(ranLed[0],ranLed[1],ranLed[2],randWait);
+    writeAll(ranLed[0],ranLed[1],ranLed[2]);
+    
+    delay(randWait*1.30);
+    noTone(speackerPin);
+    //run atleast twice then there exists a probability of exiting. 
+    if(count < (int)(random(0,4)+.5))
       break;
     count--;
   }
-  fadeTo(ledOff,ledOff,ledOff,randWait);
+  //reset
+  fadeTo(ledOff,ledOff,ledOff,250);
 }
 void reset() {
   fadeTo(ledOff,ledOff,ledOff,1000);
