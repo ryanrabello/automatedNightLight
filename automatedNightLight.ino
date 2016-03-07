@@ -5,7 +5,7 @@ int led[] = {9,5,6};
 //Other config options see https://github.com/asteroidice/automatedNightLight/ for detailed info on what they do.
 const int photocellPin = 0;
 const int timeDim = 120;
-const int timeOn = 1800;    
+const int timeOn = 1800;
 const int ledOff = 255;     //Led full of pwm value.
 const int ledOn = 150;        //led full pwm brightness.
 const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
@@ -56,7 +56,7 @@ void writeAll(int r, int g, int b) {
   ledStates[2] = b;
 }
 
-//Transistion from current to inputed values 
+//Transistion from current to inputed values
 void fadeTo(int red, int green, int blue,int transitionTime) {
   //Want 20 fps
   float spf = 1.0/((float)transitionTime*9.0);
@@ -112,7 +112,7 @@ void lightOn() {
     changeLed();
     currentLedSwitch = ledBuffer;
   }
-  
+
 }
 void changeLed(){
   changeLed(false);
@@ -120,12 +120,12 @@ void changeLed(){
 void changeLed(boolean slow) {
   int ranLed[3];
   if((int)(random(0,4) + .5) == 0){
-    //25% of time. 
+    //25% of time.
     for (int i = 0; i < 3; i ++){
       ranLed[i] = (int)(random(ledOn,ledOff) + .5);
     }
   }else{
-    //75% of time. 
+    //75% of time.
     while(true){
       for (int i = 0; i < 3; i ++){
         ranLed[i] = (ledOff-ledOn)*(int)(random(0,2)) + ledOn;
@@ -139,7 +139,7 @@ void changeLed(boolean slow) {
   else
     fadeTo(ranLed[0],ranLed[1],ranLed[2],1000);
 }
-  
+
 void nap() {
   time++;
   if(time >= timeOn){
@@ -163,7 +163,7 @@ void randomPattern() {
         ranLed[i] = (int)(random(ledOn,ledOff) + .5);
       }
     }else{
-      //75% of time. 
+      //75% of time.
       while(true){
         for (int i = 0; i < 3; i ++){
           ranLed[i] = (ledOff-ledOn)*(int)(random(0,2)) + ledOn;
@@ -174,10 +174,10 @@ void randomPattern() {
     }
     fadeTo(ranLed[0],ranLed[1],ranLed[2],75);
     //writeAll(ranLed[0],ranLed[1],ranLed[2]);
-    
+
     delay(randWait*.75);
     noTone(speackerPin);
-    //run atleast twice then there exists a probability of exiting. 
+    //run atleast twice then there exists a probability of exiting.
     if(count < (int)(random(0,5)+.5))
       break;
     count--;
@@ -205,7 +205,8 @@ void loop() {
         //add some fun on abiance changes
         if(abs(a-prevAnalogRead) > 5)
           randomPattern();
-        prevAnalogRead = a;
+        else
+          prevAnalogRead = a;
       }
       break;
     case 'n':
@@ -221,4 +222,3 @@ void loop() {
   }
   delay(mainDelay);
 }
-
