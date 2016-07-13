@@ -1,30 +1,12 @@
-/*//Initialize led pins
-const int led[] = {9,5,6};
-
-//Other config options see https://github.com/asteroidice/automatedNightLight/ for detailed info on what they do.
-const int photocellPin = 0;
-const int timeOn = 1800;
-const int ledOff = 255;     //Led full off pwm value.
-const int ledOn = 150;        //led full pwm brightness.
-const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
-const int ledBuffer = 7;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
-
-//Don Touch it!!!
-//These values are global variables becuase they need to be referenced later.
-//they are set to ledOff so RGB led's are off.
-int ledStates[] = {
-  ledOff,ledOff,ledOff};
-//More global variables
-int currentLedSwitch = ledSwitch;
-int time = 0;
-int mainDelay = 1000;
-char mode = 'a';
-int prevAnalogRead;*/
+//Constants
+const int led = 13;
+const int ledSwitch = 
+//GLobalVars
 
 void setup() {
   //Initialize those output ports.
-  pinMode(13,OUTPUT);
-  analogWrite(13,ledOff);
+  pinMode(led,OUTPUT);
+  analogWrite(led,0);
 }
 
 
