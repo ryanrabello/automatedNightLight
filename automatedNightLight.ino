@@ -10,7 +10,7 @@ const int ledOff = 255;     //Led full of pwm value.
 const int ledOn = 150;        //led full pwm brightness.
 const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
 const int ledBuffer = 7;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
-const int speackerPin = 3;
+const int speakerPin = 3;
 
 //Don Touch it!!!
 //These values are global variables becuase they need to be referenced later.
@@ -155,7 +155,7 @@ void randomPattern() {
   while(count > 0) {
     int randWait = 1000/noteDurations[(int)(random(0,durationSize)+.5)];
     int randNote = (int)(random(0,noteSize) + .5);
-    tone(speackerPin, notes[randNote]);
+    tone(speakerPin, notes[randNote]);
     //Configure led array
     if((int)(random(0,4) + .5) == 0){
       //25% of time.
@@ -176,7 +176,7 @@ void randomPattern() {
     //writeAll(ranLed[0],ranLed[1],ranLed[2]);
 
     delay(randWait*.75);
-    noTone(speackerPin);
+    noTone(speakerPin);
     //run atleast twice then there exists a probability of exiting.
     if(count < (int)(random(0,5)+.5))
       break;
