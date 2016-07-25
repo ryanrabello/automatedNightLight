@@ -1,14 +1,14 @@
 //Initialize led pins
-int led[] = {3,5,6};
+int led[] = {6,5,3};
 
 //Other config options see https://github.com/asteroidice/automatedNightLight/ for detailed info on what they do.
 const int photocellPin = 0;
-const int timeDim = 120;
+const int timeDim = 1200;
 const int timeOn = 1800;
 const int ledOff = 255;     //Led full of pwm value.
-const int ledOn = 150;        //led full pwm brightness.
-const int ledSwitch = 5;    //photo sensor reading for toggling the led on/off state
-const int ledBuffer = 7;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
+const int ledOn = 175;        //led full pwm brightness.
+const int ledSwitch = 8;    //photo sensor reading for toggling the led on/off state
+const int ledBuffer = 13;    //photo sensor sensitivity when light is on. (this will hopefully reduce repeated on/off toggle.)
 
 //Don Touch it!!!
 //These values are global variables becuase they need to be referenced later.
@@ -24,6 +24,8 @@ int prevAnalogRead;
 int timeDelays[] = {2,3,4, 8, 16 , 32};
 
 void setup() {
+  //initialize serialOutput
+  //Serial.begin(9600);
   //Initialize those output ports.
   for(int i = 0; i < (sizeof(led)/sizeof(int)); i++) {
     pinMode(led[i],OUTPUT);
@@ -31,13 +33,6 @@ void setup() {
   }
   //Get random brightness and use it as the seed.
   randomSeed(analogRead(0));
-  writeAll(ledOff);
-  delay(1000);
-  writeAll(ledOn);
-  delay(1000);
-  writeAll(ledOff);
-  delay(1000);
-
 }
 
 //set all the led's to the inputed value
@@ -74,6 +69,8 @@ void fadeTo(int red, int green, int blue,int transitionTime) {
 }
 
 void lightOn() {
+  //Serial.print("LightOn();");
+  mode = 'o';
   //Turn light on for X minutes and then fade it to dark then turn off light and goto sleep mode (all the while checking if the lights came back on)
   if(ledStates[0] != ledOff || ledStates[1] != ledOff || ledStates[2] != ledOff) { //if light is on
     time++;
@@ -119,6 +116,7 @@ void changeLed(boolean slow) {
 }
 
 void nap() {
+  //Serial.print("nap();");
   time++;
   if(time >= timeOn){
     mode = 's';
@@ -128,6 +126,7 @@ void nap() {
 }
 
 void randomPattern() {
+  //Serial.println("randomPattern();");
   int randWait = 1000/timeDelays[(int)(random(0,4)+.5)];
   int count = 7;
   int ranLed[3];
@@ -165,6 +164,7 @@ void reset() {
   mainDelay = 1000;
   currentLedSwitch = ledSwitch;
   time = 0;
+  prevAnalogRead = analogRead(photocellPin);
 }
 void loop() {
   int a = analogRead(photocellPin);
@@ -179,9 +179,11 @@ void loop() {
         //add some fun on abiance changes
         if(abs(a-prevAnalogRead) > 5)
           randomPattern();
-        else
-          prevAnalogRead = a;
       }
+      prevAnalogRead = a;
+      break;
+    case 'o'://light is on run light on.
+      lightOn();
       break;
     case 'n':
       nap();
@@ -192,7 +194,15 @@ void loop() {
       break;
     default:
       mode = 'n';
+      fadeTo(220,240,255,3000);
       break;
   }
+  //Serial.print(mode);
+  //Serial.print(", ");
+  //Serial.print(a);
+  //Serial.print(", ");
+  //Serial.print(prevAnalogRead);
+  //Serial.print(", ");
+  //Serial.println(time);
   delay(mainDelay);
 }
